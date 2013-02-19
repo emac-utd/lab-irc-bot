@@ -1,12 +1,12 @@
 var irc = require('irc');
 var _ = require('underscore');
-var user = 'iamabotus';
+var user = 'iamaboutus';
 
 var client = new irc.Client('irc.freenode.net', user, {
     channels: ['#EMAClab']
 });
 
-var ops = ['harrisonm', 'maaaaaax', 'afamiglietti', 'karlam', 'DeeptiN'];
+var ops = ['harrisonm', 'maxme', 'afamiglietti', 'karlam', 'DeeptiN'];
 
 client.addListener('join#EMAClab', function(nick,message){
 
@@ -38,3 +38,26 @@ client.addListener('notice', function(from, to, text, message){
     }
 
 });
+
+client.addListener('message#EMAClab', function (from, message) {
+    var emac;
+    var emacronyms = [];
+    if (message.substring(0,6) == '!EMAC ') {
+        console.log('matches');
+        emac = {
+            by: from,
+            means: message.substring(6)
+        };
+
+        client.send('TOPIC','#EMAClab', emac.means );
+        emacronyms.push(emac);
+
+        console.log(emacronyms);
+    }
+
+
+});
+
+
+
+
