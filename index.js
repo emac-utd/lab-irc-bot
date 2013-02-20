@@ -1,6 +1,25 @@
 var irc = require('irc');
 var _ = require('underscore');
-var user = 'iamaboutus';
+var mongoose = require('mongoose');
+    mongoose.connect('localhost', 'lab-irc-bot');
+
+    var db = mongoose.connection;
+        db.on('error', console.error.bind(console, 'connection error:'));
+        db.once('open', function callback () {
+            console.log('db connected');
+        });
+
+var user = 'iamabotus';
+
+var Schema = mongoose.Schema;
+var emacronymSchema = new Schema({
+    topic: {type: String, required: true, index: true},
+    by: {type: String},
+    votes: {type: Number},
+    createdAt: { type: Date, default: Date.now }
+});
+var Emacronym = mongoose.model('Emacronym', emacronymSchema);
+
 
 var client = new irc.Client('irc.freenode.net', user, {
     channels: ['#EMAClab']
@@ -41,7 +60,6 @@ client.addListener('notice', function(from, to, text, message){
 
 client.addListener('message#EMAClab', function (from, message) {
     var emac;
-    var emacronyms = [];
     if (message.substring(0,6) == '!EMAC ') {
         console.log('matches');
         emac = {
@@ -50,9 +68,18 @@ client.addListener('message#EMAClab', function (from, message) {
         };
 
         client.send('TOPIC','#EMAClab', emac.means );
-        emacronyms.push(emac);
+        var emacronym = new Emacronym({
+            topic: emac.means,
+            by: emac.by,
+            votes: 0
+        });
 
-        console.log(emacronyms);
+        emacronym.save(function (err, emacronym) {
+            if (err) // TODO handle the error
+                console.log('error saving');
+        });
+
+
     }
 
 
