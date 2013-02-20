@@ -5,6 +5,7 @@
     "main": "./index.js",
     "dependencies": {
         "irc": "*",
-        "underscore": "*"
+        "underscore": "*",
+        "mongoose": "3.5.x"
     }
 }
